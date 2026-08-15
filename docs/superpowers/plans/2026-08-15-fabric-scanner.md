@@ -1929,9 +1929,9 @@ export async function getTransactionById(
     isValid: tx.isValid,
     timestamp: tx.timestamp,
     creatorMspId: tx.creatorMspId,
-    args: tx.args as string[],
+    args: tx.args as unknown as string[],
     validationCode: tx.validationCode,
-    endorsingMspIds: tx.endorsingMspIds as string[],
+    endorsingMspIds: tx.endorsingMspIds as unknown as string[],
     readSet: tx.readSet as unknown as ReadSetEntry[],
     writeSet: tx.writeSet as unknown as WriteSetEntry[],
   };
