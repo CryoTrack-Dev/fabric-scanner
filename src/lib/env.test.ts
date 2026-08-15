@@ -23,7 +23,7 @@ describe("loadEnv", () => {
     expect(env.channelName).toBe("supplychain");
     expect(env.userName).toBe("User1");
     expect(env.pollIntervalMs).toBe(3000);
-    expect(env.fabricCryptoBase).toContain("crypto-material");
+    expect(env.fabricCryptoBase).toContain("organizations");
   });
 
   it("reads required vars from process.env", () => {

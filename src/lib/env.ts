@@ -19,7 +19,7 @@ export function loadEnv(): ScannerEnv {
   return {
     fabricCryptoBase:
       process.env.FABRIC_CRYPTO_BASE ??
-      "/Users/manibrar/Documents/CryoTrack/fabric/packages/network/crypto-material",
+      "/Users/manibrar/Documents/CryoTrack/fabric/packages/ca/organizations",
     peerAddress: required("PEER_ADDRESS"),
     peerName: required("PEER_NAME"),
     mspId: required("PEER_MSP_ID"),
