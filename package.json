@@ -1,0 +1,43 @@
+{
+  "name": "cryotrack-scanner",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "indexer": "tsx watch scripts/indexer.ts",
+    "dev:all": "concurrently -n next,indexer -c blue,green \"pnpm dev\" \"pnpm indexer\"",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "test": "vitest run",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:generate": "prisma generate",
+    "preinstall": "npx only-allow pnpm"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.14.3",
+    "@hyperledger/fabric-gateway": "^1.10.1",
+    "@prisma/client": "^7.7.0",
+    "clsx": "^2.1.1",
+    "fabric-common": "^2.2.20",
+    "fabric-protos": "^2.2.20",
+    "next": "16.1.6",
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "concurrently": "^9.1.2",
+    "dotenv": "^16.4.5",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "prisma": "^7.7.0",
+    "tailwindcss": "^4",
+    "tsx": "^4.19.2",
+    "typescript": "^5",
+    "vitest": "^4.1.9"
+  }
+}
