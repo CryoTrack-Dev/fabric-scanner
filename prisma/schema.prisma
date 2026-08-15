@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Block {
+  number       Int           @id
+  hash         String?
+  previousHash String
+  dataHash     String
+  txCount      Int
+  timestamp    DateTime
+  transactions Transaction[]
+}
+
+model Transaction {
+  txId            String   @id
+  blockNumber     Int
+  indexInBlock    Int
+  timestamp       DateTime
+  creatorMspId    String
+  chaincodeName   String
+  functionName    String
+  args            Json
+  validationCode  String
+  isValid         Boolean
+  endorsingMspIds Json
+  readSet         Json
+  writeSet        Json
+  block           Block    @relation(fields: [blockNumber], references: [number])
+
+  @@index([blockNumber])
+  @@index([chaincodeName, functionName])
+}
