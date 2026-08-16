@@ -41,7 +41,7 @@ export async function connectToFabric(env: ScannerEnv): Promise<FabricConnection
   const certPem = await fs.readFile(path.join(paths.certDir, certFile));
   const identity: Identity = { mspId: env.mspId, credentials: certPem };
 
-  const keyFile = (await fs.readdir(paths.keyDir))[0];
+  const keyFile = (await fs.readdir(paths.keyDir)).find((f) => !f.startsWith("."));
   if (!keyFile) throw new Error(`No private key found under ${paths.keyDir}`);
   const keyPem = await fs.readFile(path.join(paths.keyDir, keyFile));
   const signer: Signer = signers.newPrivateKeySigner(crypto.createPrivateKey(keyPem));

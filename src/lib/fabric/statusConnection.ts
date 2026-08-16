@@ -12,7 +12,13 @@ declare global {
 
 export function getSharedFabricConnection(): Promise<FabricConnection> {
   if (!globalThis.__fabricConnectionPromise) {
-    globalThis.__fabricConnectionPromise = connectToFabric(loadEnv());
+    globalThis.__fabricConnectionPromise = connectToFabric(loadEnv()).catch((error) => {
+      // Clear the cache on failure so the next call retries fresh instead of
+      // re-awaiting a permanently-rejected promise forever (e.g. after a
+      // transient peer outage).
+      globalThis.__fabricConnectionPromise = undefined;
+      throw error;
+    });
   }
   return globalThis.__fabricConnectionPromise;
 }

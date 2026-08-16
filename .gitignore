@@ -6,3 +6,4 @@ scanner.db-journal
 *.db-journal
 .env
 .env.local
+*.tsbuildinfo

@@ -63,6 +63,9 @@ async function main() {
     async setBlockHash(blockNumber, hash) {
       await prisma.block.update({ where: { number: blockNumber }, data: { hash } });
     },
+    logSkippedBlock(blockNumber, error) {
+      console.error(`Skipping block ${blockNumber} — failed to index:`, error);
+    },
   };
 
   console.log(`CryoTrack Fabric scanner indexer started — polling every ${env.pollIntervalMs}ms`);

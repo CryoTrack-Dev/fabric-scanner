@@ -19,6 +19,7 @@ function makeDeps(overrides: Partial<SyncDeps> = {}): SyncDeps {
     fetchAndDecodeBlock: vi.fn(async (n: number) => fakeBlock(n)),
     persistBlock: vi.fn().mockResolvedValue(undefined),
     setBlockHash: vi.fn().mockResolvedValue(undefined),
+    logSkippedBlock: vi.fn(),
     ...overrides,
   };
 }
@@ -86,5 +87,25 @@ describe("syncOnce", () => {
     await syncOnce(deps);
 
     expect(deps.setBlockHash).toHaveBeenCalledWith(2, "tip-hash");
+  });
+
+  it("skips a block that fails to persist and continues indexing subsequent blocks", async () => {
+    const failure = new Error("UNIQUE constraint failed: Transaction.txId");
+    const deps = makeDeps({
+      getChainHeight: vi.fn().mockResolvedValue(4),
+      getLastIndexedBlockNumber: vi.fn().mockResolvedValue(null),
+      persistBlock: vi.fn(async (block: DecodedBlock) => {
+        if (block.number === 1) throw failure;
+      }),
+    });
+
+    const result = await syncOnce(deps);
+
+    // Block 1 (the failing block) is skipped, but 2 and 3 are still indexed
+    // in the same pass rather than the whole loop wedging on block 1 forever.
+    expect(result.indexedBlockNumbers).toEqual([0, 2, 3]);
+    expect(result.indexedBlockNumbers).not.toContain(1);
+    expect(deps.logSkippedBlock).toHaveBeenCalledWith(1, failure);
+    expect(deps.persistBlock).toHaveBeenCalledTimes(4); // still attempted once for every block, including 1
   });
 });

@@ -7,6 +7,14 @@ export interface SyncDeps {
   fetchAndDecodeBlock(blockNumber: number): Promise<DecodedBlock>;
   persistBlock(block: DecodedBlock): Promise<void>;
   setBlockHash(blockNumber: number, hash: string): Promise<void>;
+  /**
+   * Called when a single block fails to index (e.g. a persistence error such
+   * as a txId unique-constraint violation). The block is logged and skipped
+   * so a single bad block can't wedge the indexer forever; subsequent blocks
+   * in the same pass are still processed. Kept out of console.error directly
+   * so this module stays pure/testable.
+   */
+  logSkippedBlock(blockNumber: number, error: unknown): void;
 }
 
 export interface SyncResult {
@@ -21,12 +29,17 @@ export async function syncOnce(deps: SyncDeps): Promise<SyncResult> {
   const indexedBlockNumbers: number[] = [];
 
   for (let blockNumber = nextToIndex; blockNumber < height; blockNumber++) {
-    const block = await deps.fetchAndDecodeBlock(blockNumber);
-    await deps.persistBlock(block);
-    if (blockNumber > 0) {
-      await deps.setBlockHash(blockNumber - 1, block.previousHash);
+    try {
+      const block = await deps.fetchAndDecodeBlock(blockNumber);
+      await deps.persistBlock(block);
+      if (blockNumber > 0) {
+        await deps.setBlockHash(blockNumber - 1, block.previousHash);
+      }
+      indexedBlockNumbers.push(blockNumber);
+    } catch (error) {
+      deps.logSkippedBlock(blockNumber, error);
+      continue;
     }
-    indexedBlockNumbers.push(blockNumber);
   }
 
   if (indexedBlockNumbers.length > 0) {
